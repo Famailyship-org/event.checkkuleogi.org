@@ -1,4 +1,4 @@
-package com.system.fcfs;
+package com.system.fcfs.infra;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.LongDeserializer;

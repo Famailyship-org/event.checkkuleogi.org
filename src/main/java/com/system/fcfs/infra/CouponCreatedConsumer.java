@@ -1,7 +1,5 @@
-package com.system.fcfs;
+package com.system.fcfs.infra;
 
-import com.system.fcfs.domain.Coupon;
-import com.system.fcfs.infra.CouponRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;

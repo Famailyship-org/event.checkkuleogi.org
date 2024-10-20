@@ -1,4 +1,4 @@
-package com.system.fcfs;
+package com.system.fcfs.infra;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;

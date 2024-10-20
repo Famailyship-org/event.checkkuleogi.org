@@ -2,17 +2,24 @@ package com.system.fcfs;
 
 import com.system.fcfs.infra.CouponRepository;
 import com.system.fcfs.service.CouponService;
+import com.system.fcfs.ver2.GifticonService;
+import com.system.fcfs.ver2.constant.Event;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.info.GitProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 @Transactional
@@ -23,6 +30,8 @@ public class CouponServiceTest {
 
     @Autowired
     private CouponRepository couponRepository;
+
+
 
     @Test
     void 한번만응모() {
@@ -72,4 +81,6 @@ public class CouponServiceTest {
         assertThat(count).isEqualTo(100);
 
     }
+
+
 }

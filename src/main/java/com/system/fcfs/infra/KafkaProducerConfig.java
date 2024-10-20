@@ -1,4 +1,4 @@
-package com.system.fcfs;
+package com.system.fcfs.infra;
 
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.LongSerializer;

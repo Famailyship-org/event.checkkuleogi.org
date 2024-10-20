@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: checkkuleogi
+  data:
+    redis:
+      host: localhost
+      port: 63799

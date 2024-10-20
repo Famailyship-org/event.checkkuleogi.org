@@ -1,6 +1,6 @@
 package com.system.fcfs.service;
 
-import com.system.fcfs.CouponCreateProducer;
+import com.system.fcfs.infra.CouponCreateProducer;
 import com.system.fcfs.infra.CouponCountRepository;
 import com.system.fcfs.infra.CouponRepository;
 import lombok.RequiredArgsConstructor;
