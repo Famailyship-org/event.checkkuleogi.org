@@ -1,15 +1,24 @@
 spring:
   application:
-    name: checkkuleogi
+    name: fcfs
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     show-sql: true
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3307/fcfs
+    url: jdbc:mysql://localhost:3307/fcfs
     username: root
     password: root
-  data:
-    redis:
-      port: 63799
+  redis:
+    host: localhost
+    port: 63799
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus
+  metrics:
+    export:
+      prometheus:
+        enabled: true
