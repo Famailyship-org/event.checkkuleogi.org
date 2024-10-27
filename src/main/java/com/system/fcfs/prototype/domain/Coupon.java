@@ -23,5 +23,4 @@ public class Coupon {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Event event;
-
 }

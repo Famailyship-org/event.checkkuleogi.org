@@ -11,11 +11,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class WinnerLog {
+public class Winner {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "coupon_winning_log_id")
-    private Long id;
+    @Column(name = "idx")
+    private Long idx;
 
 //    @OneToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "coupon_id")
@@ -24,4 +24,5 @@ public class WinnerLog {
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "winner_id")
     private String winner;
+    private String time;
 }

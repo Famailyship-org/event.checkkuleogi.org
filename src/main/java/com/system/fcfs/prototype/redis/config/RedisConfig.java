@@ -1,6 +1,6 @@
-package com.system.fcfs.prototype.config;
+package com.system.fcfs.prototype.redis.config;
 
-import com.system.fcfs.prototype.properties.RedisProperty;
+import com.system.fcfs.prototype.redis.properties.RedisProperty;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

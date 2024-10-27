@@ -1,11 +1,9 @@
 package com.system.fcfs.prototype.domain;
 
-import com.system.fcfs.prototype.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Entity
 @Getter

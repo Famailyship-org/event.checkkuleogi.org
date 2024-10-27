@@ -25,6 +25,15 @@ bin/
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
+/src/main/resources/application-prod.yml
+application-prod.yml
+application.yml
+compose.yml
+prometheus.yml
+test_script
+.gitattributes
+/grafana
+
 
 ### NetBeans ###
 /nbproject/private/
