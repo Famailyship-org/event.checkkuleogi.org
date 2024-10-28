@@ -1,10 +1,10 @@
-package com.system.fcfs.prototype.dto;
+package com.system.fcfs.event.dto;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class CreateCouponRequestDTO {
+public class CreateEventRequestDTO {
     private String userId;
 }
