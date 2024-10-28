@@ -1,9 +1,7 @@
 package com.system.fcfs.event.controller;
 
-import com.system.fcfs.event.constant.Event;
 import com.system.fcfs.event.dto.GetWinnerResponseDTO;
 import com.system.fcfs.event.dto.PostEventRequestDTO;
-import com.system.fcfs.event.scheduler.EventScheduler;
 import com.system.fcfs.event.service.EventService;
 import com.system.fcfs.global.domain.response.CommonResponseEntity;
 import lombok.RequiredArgsConstructor;
