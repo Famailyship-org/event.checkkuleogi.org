@@ -30,9 +30,10 @@ application-prod.yml
 application.yml
 compose.yml
 prometheus.yml
-test_script
+/test-script
 .gitattributes
 /grafana
+test-script
 
 
 ### NetBeans ###
