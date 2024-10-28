@@ -1,13 +1,11 @@
-package com.system.fcfs.prototype.domain;
+package com.system.fcfs.event.domain;
 
-import com.system.fcfs.prototype.constant.Event;
+import com.system.fcfs.event.constant.Event;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.UUID;
 
 @Entity
 @Builder

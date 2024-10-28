@@ -1,4 +1,4 @@
-package com.system.fcfs.prototype.constant;
+package com.system.fcfs.event.constant;
 
 import lombok.Getter;
 

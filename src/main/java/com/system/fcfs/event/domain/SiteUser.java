@@ -1,4 +1,4 @@
-package com.system.fcfs.prototype.domain;
+package com.system.fcfs.event.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;

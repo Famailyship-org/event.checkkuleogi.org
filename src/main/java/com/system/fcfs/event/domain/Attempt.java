@@ -1,4 +1,4 @@
-package com.system.fcfs.prototype.domain;
+package com.system.fcfs.event.domain;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -11,7 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class Winner {
+@Table(name = "attempt")
+public class Attempt {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idx")
@@ -23,6 +24,8 @@ public class Winner {
 
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "winner_id")
-    private String winner;
-    private String time;
+    private String userName;
+    private String timeStamp;
+    @Column(name = "user_rank")
+    private Long rank;
 }

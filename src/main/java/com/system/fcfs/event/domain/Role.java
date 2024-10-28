@@ -1,4 +1,4 @@
-package com.system.fcfs.prototype.domain;
+package com.system.fcfs.event.domain;
 
 public enum Role {
     USER,    // 회원
