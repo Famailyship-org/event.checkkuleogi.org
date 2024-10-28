@@ -1,9 +1,9 @@
-package com.system.fcfs.prototype.service;
+package com.system.fcfs.event.service;
 
-import com.system.fcfs.prototype.constant.Event;
-import com.system.fcfs.prototype.domain.Winner;
-import com.system.fcfs.prototype.domain.repository.WinnerRepository;
-import com.system.fcfs.prototype.dto.GetWinnerResponseDTO;
+import com.system.fcfs.event.domain.Attempt;
+import com.system.fcfs.event.domain.repository.AttemptRepository;
+import com.system.fcfs.event.dto.GetWinnerResponseDTO;
+import com.system.fcfs.event.dto.PostEventRequestDTO;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.PageRequest;
@@ -11,26 +11,22 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Log4j2
 @Service
-public class CouponService {
-    private final WinnerRepository winnerRepository;
+public class EventService {
+    private final AttemptRepository attemptRepository;
 
     // 원하는 구현체를 선택하도록 @Qualifier 사용
-    public CouponService(@Qualifier("jpaWinnerRepository") WinnerRepository winnerRepository) {
-        this.winnerRepository = winnerRepository;
+    public EventService(@Qualifier("redisAttemptRepository") AttemptRepository attemptRepository) {
+        this.attemptRepository = attemptRepository;
     }
 
     @Transactional
-    public void addQueue(Event event, String userId) {
-        final String people = Thread.currentThread().getName() + ", time: " + System.currentTimeMillis();
-        final Instant stamp = Instant.now();
-        String now = stamp.toString();
-        winnerRepository.addQueue(userId, now, event);
+    public void addQueue(PostEventRequestDTO postEventRequestDTO) {
+        attemptRepository.addQueue(postEventRequestDTO);
     }
 
     // 기프티콘을 발급하는 메서드
@@ -56,13 +52,21 @@ public class CouponService {
     // 당첨자를 조회하는 메서드
     public List<GetWinnerResponseDTO> getTop100Winners() {
         Pageable pageable = PageRequest.of(0, 100);
-        List<Winner> winners = winnerRepository.geTop100Winner(pageable);
-        return winners.stream()
-                .map(winner -> GetWinnerResponseDTO.builder()
-                        .userId(winner.getWinner())
-                        .time(winner.getTime())
-                        .coupon(winner.getCoupon())
+        List<Attempt> attempts = attemptRepository.geTop100Attempt(pageable);
+        return attempts.stream()
+                .map(attempt -> GetWinnerResponseDTO.builder()
+                        .userId(attempt.getUserName())
+                        .time(attempt.getTimeStamp())
+                        .rank(attempt.getRank())
+                        .coupon(attempt.getCoupon())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    public void validRequest(PostEventRequestDTO userId) {
+        // 1. 해당 유저가 이미 참여했는지 확인
+        if (attemptRepository.existsByAttemptAndEvent(userId)) {
+            throw new IllegalArgumentException("이미 참여한 유저입니다.");
+        }
     }
 }
