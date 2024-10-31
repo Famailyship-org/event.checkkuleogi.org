@@ -6,8 +6,6 @@ import com.system.fcfs.event.dto.response.GetWinnerResponseDTO;
 import com.system.fcfs.event.exception.DuplicatedException;
 import com.system.fcfs.event.implementation.manager.EventMangerT;
 import com.system.fcfs.event.repository.AttemptRepository;
-import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -27,18 +25,6 @@ public class EventService {
         this.eventMangerT = eventMangerT;
     }
 
-    public Boolean addQueue(PostEventRequestDTO postEventRequestDTO) {
-        if(!eventMangerT.validRequest(postEventRequestDTO)){
-            throw new DuplicatedException("중복 응모입니다.");
-        };
-        return attemptRepository.addQueue(postEventRequestDTO);
-    }
-
-    public List<GetWinnerResponseDTO> getTop100Winners(String eventName) {
-        List<Winner> winners = attemptRepository.getTop100Winners(eventName);
-        return toWinnerResponseDTO(winners);
-    }
-
     private static List<GetWinnerResponseDTO> toWinnerResponseDTO(List<Winner> winners) {
         return winners.stream()
                 .map(winner -> GetWinnerResponseDTO.builder()
@@ -47,5 +33,17 @@ public class EventService {
                         .coupon(winner.getEvent())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    public Boolean addQueue(PostEventRequestDTO postEventRequestDTO) {
+        if (!eventMangerT.validRequest(postEventRequestDTO)) {
+            throw new DuplicatedException("중복 응모입니다.");
+        }
+        return attemptRepository.addQueue(postEventRequestDTO);
+    }
+
+    public List<GetWinnerResponseDTO> getTop100Winners(String eventName) {
+        List<Winner> winners = attemptRepository.getTop100Winners(eventName);
+        return toWinnerResponseDTO(winners);
     }
 }

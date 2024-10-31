@@ -1,11 +1,9 @@
 package com.system.fcfs.event.implementation.manager;
 
 import com.system.fcfs.event.dto.request.PostEventRequestDTO;
-import com.system.fcfs.event.producer.SqsMessageSender;
 import lombok.AllArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
-import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
 
 @Component
 @AllArgsConstructor
