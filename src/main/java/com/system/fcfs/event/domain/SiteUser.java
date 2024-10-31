@@ -1,13 +1,13 @@
 package com.system.fcfs.event.domain;
 
+import com.system.fcfs.event.constant.Role;
 import jakarta.persistence.*;
-import lombok.Getter;
 
 import java.time.LocalDate;
 
-@Entity
-@Getter
-@Table(name = "user")
+//@Entity
+//@Getter
+//@Table(name = "user")
 public class SiteUser{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
