@@ -1,8 +1,7 @@
-package com.system.fcfs.event.component;
+package com.system.fcfs.event.producer;
 
 import io.awspring.cloud.sqs.operations.SendResult;
 import io.awspring.cloud.sqs.operations.SqsTemplate;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import software.amazon.awssdk.services.sqs.SqsAsyncClient;

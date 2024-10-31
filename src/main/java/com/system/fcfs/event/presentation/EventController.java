@@ -1,4 +1,4 @@
-package com.system.fcfs.event.implementation;
+package com.system.fcfs.event.presentation;
 
 import com.system.fcfs.event.dto.response.GetWinnerResponseDTO;
 import com.system.fcfs.event.dto.request.PostEventRequestDTO;
@@ -21,17 +21,11 @@ public class EventController {
 
     @PostMapping("/attempt")
     public CommonResponseEntity requestEvent(@RequestBody PostEventRequestDTO postEventRequestDTO) {
-        // log.info("Received request: {}", postEventRequestDTO);
-        // 1. 먼저 해당 요청이 유효한지 아닌지 확인한다.
-        // couponService.validRequest(postEventRequestDTO);
-        // 2. 해당 요청을 큐에 넣는다.
-        couponService.addQueue(postEventRequestDTO);
-        return success(true);
+        return success(couponService.addQueue(postEventRequestDTO));
     }
 
     @GetMapping("/winner/{eventName}")
     public CommonResponseEntity<List<GetWinnerResponseDTO>> getWinner(@PathVariable String eventName) {
-        // log.info("Received request: {}", eventName);
         return success(couponService.getTop100Winners(eventName));
     }
 }

@@ -1,4 +1,4 @@
-package com.system.fcfs.event.config;
+package com.system.fcfs.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

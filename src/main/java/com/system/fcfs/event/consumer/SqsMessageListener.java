@@ -1,4 +1,4 @@
-package com.system.fcfs.event.component;
+package com.system.fcfs.event.consumer;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,6 +13,7 @@ import software.amazon.awssdk.services.sqs.model.DeleteMessageRequest;
 import software.amazon.awssdk.services.sqs.model.Message;
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -28,39 +29,38 @@ public class SqsMessageListener {
     @Value("${spring.cloud.aws.sqs.queue-url}")
     private String queueUrl;
 
-    public void receiveAndSaveMessages() {
+    public List<Winner> receiveAndSaveMessages() {
         ReceiveMessageRequest receiveRequest = ReceiveMessageRequest.builder()
                 .queueUrl(queueUrl)
                 .maxNumberOfMessages(10)
                 .build();
 
         List<Message> messages = sqsClient.receiveMessage(receiveRequest).messages();
-
+        List<Winner> winners = new ArrayList<>();
         for (Message message : messages) {
             Winner winner = parseMessageBody(message);
             if (winner != null) {
                 winnerRepository.save(winner);
                 deleteMessageFromQueue(message);
+                winners.add(winner);
             }
         }
-
+        return winners;
     }
 
     private Winner parseMessageBody(Message message) {
         try {
             // JSON 메시지의 body 파싱
             JsonNode bodyNode = objectMapper.readTree(message.body());
-
             // JSON에서 필요한 필드를 추출하여 Winner 객체에 매핑
             return Winner.builder()
-                    .winner(bodyNode.get("winner").asText())         // winner 필드에 매핑
-                    .timeStamp(bodyNode.get("timeStamp").asText())   // timeStamp 필드에 매핑
-                    .rank(bodyNode.get("rank").asLong())             // rank 필드에 매핑
-                    .event(bodyNode.get("event").asText())           // event 필드에 매핑
+                    .winner(bodyNode.get("winner").asText())
+                    .timeStamp(bodyNode.get("timeStamp").asText())
+                    .rank(bodyNode.get("rank").asLong())
+                    .event(bodyNode.get("event").asText())
                     .build();
         } catch (Exception e) {
-            log.info("content: " + e);
-            e.printStackTrace();
+            log.error("메시지 파싱에 실패했습니다. message: {}", message.body(), e);
             return null;
         }
     }

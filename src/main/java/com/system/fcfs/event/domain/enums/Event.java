@@ -1,4 +1,4 @@
-package com.system.fcfs.event.constant;
+package com.system.fcfs.event.domain.enums;
 
 import lombok.Getter;
 
