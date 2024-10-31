@@ -42,6 +42,10 @@ dependencies {
 
     implementation platform("io.awspring.cloud:spring-cloud-aws-dependencies:3.0.1")
     implementation 'io.awspring.cloud:spring-cloud-aws-starter-sqs'
+
+    // Redis와 Spring Boot 간의 통신을 위한 클라이언트 라이브러리
+    implementation 'org.apache.commons:commons-pool2'  // Redis 연결 풀을 위한 라이브러리
+
 }
 
 tasks.named('test') {
