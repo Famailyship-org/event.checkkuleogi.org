@@ -4,7 +4,6 @@ package com.system.fcfs.event.repository;
 import com.system.fcfs.event.domain.Winner;
 import com.system.fcfs.event.dto.request.PostEventRequestDTO;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -21,7 +20,7 @@ public class RedisAttemptRepository implements AttemptRepository {
     }
 
     @Override
-    public List<Winner> geTop100Attempt(Pageable pageable, String eventName) {
+    public List<Winner> getTop100Winners(String eventName) {
         Set<String> result = redisTemplate.opsForZSet().range(eventName, 0, 99);
         log.info("result: {}", result);
         List<Winner> winners = result.stream()
@@ -35,15 +34,16 @@ public class RedisAttemptRepository implements AttemptRepository {
     }
 
     @Override
-    public boolean existsByAttemptAndEvent(PostEventRequestDTO postEventRequestDTO) {
+    public Boolean existsByAttemptAndEvent(PostEventRequestDTO postEventRequestDTO) {
         return redisTemplate.opsForSet().isMember(postEventRequestDTO.getEventName()
                 , postEventRequestDTO.getUserId());
     }
 
     @Override
-    public void addQueue(PostEventRequestDTO postEventRequestDTO) {
+    public Boolean addQueue(PostEventRequestDTO postEventRequestDTO) {
         redisTemplate.opsForZSet().add(postEventRequestDTO.getEventName()
                 , postEventRequestDTO.getUserId()
                 , Double.parseDouble(postEventRequestDTO.getTimestamp()));
+        return true;
     }
 }
