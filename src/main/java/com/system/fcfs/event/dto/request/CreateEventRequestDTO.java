@@ -1,4 +1,4 @@
-package com.system.fcfs.event.dto;
+package com.system.fcfs.event.dto.request;
 
 import lombok.Getter;
 import lombok.Setter;

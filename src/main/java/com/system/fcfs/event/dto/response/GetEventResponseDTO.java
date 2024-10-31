@@ -1,4 +1,4 @@
-package com.system.fcfs.event.dto;
+package com.system.fcfs.event.dto.response;
 
 import com.system.fcfs.event.domain.SiteUser;
 import lombok.Builder;

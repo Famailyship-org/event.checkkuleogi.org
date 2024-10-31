@@ -1,4 +1,4 @@
-package com.system.fcfs.event.redis.properties;
+package com.system.fcfs.event.config;
 
 import lombok.Getter;
 import lombok.Setter;

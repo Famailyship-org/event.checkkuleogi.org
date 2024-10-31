@@ -1,24 +1,22 @@
-package com.system.fcfs.event.domain.repository;
+package com.system.fcfs.event.repository;
 
 import com.system.fcfs.event.domain.Attempt;
-import com.system.fcfs.event.dto.PostEventRequestDTO;
+import com.system.fcfs.event.domain.Winner;
+import com.system.fcfs.event.dto.request.PostEventRequestDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Repository("jpaWinnerRepository")
 @RequiredArgsConstructor
 public class JpaAttemptRepository implements AttemptRepository {
 
-    private final AtomicInteger rankCounter = new AtomicInteger(1);
     private final AttemptJpaRepository attemptJpaRepository;
 
     @Override
-    public List<Attempt> geTop100Attempt(Pageable pageable) {
+    public List<Winner> geTop100Attempt(Pageable pageable, String eventName) {
         return attemptJpaRepository.findTop100(pageable);
     }
 
@@ -27,10 +25,8 @@ public class JpaAttemptRepository implements AttemptRepository {
         return attemptJpaRepository.existsByUserId(postEventRequestDTO.getUserId());
     }
 
-    @Transactional
     @Override
     public void addQueue(PostEventRequestDTO postEventRequestDTO) {
-        postEventRequestDTO.setRank((long) rankCounter.getAndIncrement());
         attemptJpaRepository.save(Attempt.builder()
                 .userName(postEventRequestDTO.getUserId())
                 .coupon(postEventRequestDTO.getEventName())

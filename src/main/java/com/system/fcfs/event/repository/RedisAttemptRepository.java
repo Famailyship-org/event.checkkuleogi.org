@@ -1,14 +1,17 @@
-package com.system.fcfs.event.domain.repository;
+package com.system.fcfs.event.repository;
 
 
-import com.system.fcfs.event.domain.Attempt;
-import com.system.fcfs.event.dto.PostEventRequestDTO;
+import com.system.fcfs.event.domain.Winner;
+import com.system.fcfs.event.dto.request.PostEventRequestDTO;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 
+@Log4j2
 @Repository("redisAttemptRepository")
 public class RedisAttemptRepository implements AttemptRepository {
     private final RedisTemplate<String, String> redisTemplate;
@@ -18,8 +21,17 @@ public class RedisAttemptRepository implements AttemptRepository {
     }
 
     @Override
-    public List<Attempt> geTop100Attempt(Pageable pageable) {
-        return List.of();
+    public List<Winner> geTop100Attempt(Pageable pageable, String eventName) {
+        Set<String> result = redisTemplate.opsForZSet().range(eventName, 0, 99);
+        log.info("result: {}", result);
+        List<Winner> winners = result.stream()
+                .map(winner -> Winner.builder()
+                        .winner(winner)
+                        .timeStamp(redisTemplate.opsForZSet().score(eventName, winner).toString())
+                        .rank(redisTemplate.opsForZSet().rank(eventName, winner))
+                        .build())
+                .toList();
+        return winners;
     }
 
     @Override
@@ -30,8 +42,6 @@ public class RedisAttemptRepository implements AttemptRepository {
 
     @Override
     public void addQueue(PostEventRequestDTO postEventRequestDTO) {
-        // 해당 이벤트에 대해 사용자를 큐에 넣는다.
-        // 그런데 그냥 set에 넣어도 되겠지? 왜냐하면 정렬자체는 나중에 할꺼니깐. -- 시간은 그냥 넣을 필요가 없다
         redisTemplate.opsForZSet().add(postEventRequestDTO.getEventName()
                 , postEventRequestDTO.getUserId()
                 , Double.parseDouble(postEventRequestDTO.getTimestamp()));
