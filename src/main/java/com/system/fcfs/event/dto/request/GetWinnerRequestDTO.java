@@ -1,4 +1,4 @@
 package com.system.fcfs.event.dto.request;
 
-public class GetWinnerRequestDTO {
+public record GetWinnerRequestDTO (){
 }
