@@ -15,17 +15,26 @@ import lombok.NoArgsConstructor;
 public class Attempt {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idx")
+    @Column(name = "attempt_idx")
     private Long idx;
 
-//    @OneToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "coupon_id")
-    private String coupon;
+    // 응모 시도는 하나의 이벤트와 다대일 관계
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "event_idx", nullable = false)
+    private Event event;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "winner_id")
-    private String userName;
+    @Column(name = "timestamp", nullable = false)
     private String timeStamp;
-    @Column(name = "user_rank")
-    private Long rank;
+
+    private boolean isSuccess;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private SiteUser user;
+
+    @Column(name = "phone_num", nullable = false)
+    private String phoneNum;
+
+    @Column(name = "user_name", nullable = false)
+    private String userName;
 }

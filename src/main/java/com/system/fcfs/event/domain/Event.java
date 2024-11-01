@@ -1,6 +1,6 @@
 package com.system.fcfs.event.domain;
 
-import com.system.fcfs.event.constant.Event;
+import com.system.fcfs.event.domain.enums.EventType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,13 +12,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Table(name = "coupon")
-public class Coupon {
+@Table(name = "event")
+public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "event_idx")
     private Long idx;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Event event;
+    private EventType eventType;
 }

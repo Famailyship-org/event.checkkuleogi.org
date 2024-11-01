@@ -1,14 +1,15 @@
 package com.system.fcfs.event.domain;
 
-import com.system.fcfs.event.constant.Role;
+import com.system.fcfs.event.domain.enums.Role;
 import jakarta.persistence.*;
+import lombok.Getter;
 
 import java.time.LocalDate;
 
-//@Entity
-//@Getter
-//@Table(name = "user")
-public class SiteUser{
+@Entity
+@Getter
+@Table(name = "user")
+public class SiteUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_idx")
@@ -35,5 +36,13 @@ public class SiteUser{
     @Enumerated(EnumType.STRING)
     @Column(name = "user_role")
     private Role role;
+
+    public void setId(Long userId) {
+        this.idx = userId;
+    }
+
+//    @OneToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "attempt_idx", nullable = false)
+//    private Attempt attempt;
 
 }
