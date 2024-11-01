@@ -1,26 +1,32 @@
 package com.system.fcfs.event.implementation.manager;
 
-import com.system.fcfs.event.dto.request.PostEventRequestDTO;
-import lombok.AllArgsConstructor;
+import com.system.fcfs.event.domain.Winner;
+import com.system.fcfs.event.dto.response.GetWinnerResponseDTO;
+import com.system.fcfs.event.producer.AttemptProducer;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Component
-@AllArgsConstructor
 public class EventMangerT {
 
-    private static final String HYPER_LOG_LOG_KEY = "userPhoneCheck";
     private final RedisTemplate<String, String> redisTemplate;
+    private final AttemptProducer attemptProducer;
 
-    public Boolean validRequest(PostEventRequestDTO postEventRequestDTO) {
-        String uniqueKey = postEventRequestDTO.getUserId() + ":" + postEventRequestDTO.getPhoneNum();
+    public EventMangerT(RedisTemplate<String, String> redisTemplate, @Qualifier("sqsAttemptRepository") AttemptProducer attemptProducer) {
+        this.redisTemplate = redisTemplate;
+        this.attemptProducer = attemptProducer;
+    }
 
-        // Redis HyperLogLog에 추가하고, 추가 전후 크기 비교
-        Long previousCount = redisTemplate.opsForHyperLogLog().size(HYPER_LOG_LOG_KEY);
-        redisTemplate.opsForHyperLogLog().add(HYPER_LOG_LOG_KEY, uniqueKey);
-        Long currentCount = redisTemplate.opsForHyperLogLog().size(HYPER_LOG_LOG_KEY);
-
-        // 추가 전후 크기가 같다면 중복으로 간주
-        return previousCount != null && currentCount != null && previousCount.equals(currentCount);
+    public List<GetWinnerResponseDTO> toWinnerResponseDTO(List<Winner> winners) {
+        return winners.stream()
+                .map(winner -> GetWinnerResponseDTO.builder()
+                        .timeStamp(winner.getTimeStamp())
+                        .phoneNum(winner.getTimeStamp())
+                        .build())
+                .collect(Collectors.toList());
     }
 }
