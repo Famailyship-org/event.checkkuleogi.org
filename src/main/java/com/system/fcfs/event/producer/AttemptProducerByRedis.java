@@ -50,16 +50,18 @@ public class AttemptProducerByRedis implements AttemptProducer {
 
     @Override
     public Boolean validRequest(PostEventRequestDTO postEventRequestDTO) {
-        return redisTemplate.opsForSet().isMember(postEventRequestDTO.eventName()
-                , postEventRequestDTO.userId());
+        return redisTemplate.opsForSet().isMember(postEventRequestDTO.getEventName()
+                , postEventRequestDTO.getUserName());
     }
 
     @Override
     public Boolean addQueue(PostEventRequestDTO postEventRequestDTO) {
+        String time = java.time.LocalDateTime.now().toString();
+
         redisTemplate.opsForZSet().add(
-                postEventRequestDTO.eventName(),
-                postEventRequestDTO.userId() + "|" + postEventRequestDTO.phoneNum(),
-                Double.parseDouble(postEventRequestDTO.timestamp())
+                postEventRequestDTO.getEventName(),
+                postEventRequestDTO.getUserName() + "|" + postEventRequestDTO.getPhoneNum(),
+                Double.parseDouble(time)
         );
         return true;
     }

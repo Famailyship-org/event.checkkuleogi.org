@@ -3,10 +3,7 @@ package com.system.fcfs.event.consumer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.system.fcfs.event.domain.Attempt;
-import com.system.fcfs.event.domain.Event;
-import com.system.fcfs.event.domain.SiteUser;
 import com.system.fcfs.event.domain.Winner;
-import com.system.fcfs.event.domain.enums.EventType;
 import com.system.fcfs.event.repository.AttemptJpaRepository;
 import com.system.fcfs.event.repository.EventRepository;
 import com.system.fcfs.event.repository.WinnerRepository;
@@ -105,27 +102,16 @@ public class SqsMessageListener {
         try {
             JsonNode bodyNode = objectMapper.readTree(message.body());
             String timeStamp = bodyNode.get("timeStamp").asText();
-            String eventTypeStr = bodyNode.get("event").asText();
+            String eventName = bodyNode.get("event").asText();
             String phoneNum = bodyNode.get("phoneNum").asText();
             String userName = bodyNode.get("userName").asText();
-            boolean isSuccess = bodyNode.get("isSuccess").asBoolean();
-            Long userId = bodyNode.get("userId").asLong();
 
-            EventType eventType = EventType.valueOf(eventTypeStr);
-
-            Event event = eventRepository.findByEventType(eventType)
-                    .orElseThrow(() -> new IllegalArgumentException("해당 이벤트를 찾을 수 없습니다: " + eventTypeStr));
-
-            SiteUser user = new SiteUser();
-            user.setId(userId);
 
             return Attempt.builder()
                     .timeStamp(timeStamp)
-                    .event(event)
+                    .eventName(eventName)
                     .phoneNum(phoneNum)
                     .userName(userName)
-                    .isSuccess(isSuccess)
-                    .user(user)
                     .build();
         } catch (Exception e) {
             throw new IllegalArgumentException("메시지 파싱에 실패했습니다. message: " + message.body(), e);
@@ -136,16 +122,15 @@ public class SqsMessageListener {
         try {
             JsonNode bodyNode = objectMapper.readTree(message.body());
             String timeStamp = bodyNode.get("timeStamp").asText();
-            String eventTypeStr = bodyNode.get("event").asText();
-
-            EventType eventType = EventType.valueOf(eventTypeStr);
-
-            Event event = eventRepository.findByEventType(eventType)
-                    .orElseThrow(() -> new IllegalArgumentException("해당 이벤트를 찾을 수 없습니다: " + eventTypeStr));
+            String eventName = bodyNode.get("eventName").asText();
+            String phoneNum = bodyNode.get("phoneNum").asText();
+            String userName = bodyNode.get("userName").asText();
 
             return Winner.builder()
                     .timeStamp(timeStamp)
-                    .event(event)
+                    .userName(userName)
+                    .phoneNum(phoneNum)
+                    .eventName(eventName)
                     .build();
         } catch (Exception e) {
             throw new IllegalArgumentException("메시지 파싱에 실패했습니다. message: " + message.body(), e);
@@ -159,5 +144,4 @@ public class SqsMessageListener {
                 .build();
         sqsClient.deleteMessage(deleteRequest);
     }
-
 }

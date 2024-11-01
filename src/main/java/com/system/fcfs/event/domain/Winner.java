@@ -17,14 +17,21 @@ public class Winner {
     @Column(name = "winner_idx")
     private Long idx;
     // 당첨자는 하나의 응모 시도와 일대일 관계
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "attempt_idx", nullable = false)
-    private Attempt attempt;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "attempt_idx", nullable = false)
+    @Column(name = "attempt_idx", nullable = false)
+    private Long attemptIdx;
 
     @Column(name = "timestamp", nullable = false)
     private String timeStamp;
 
-    @JoinColumn(name = "event_idx", nullable = false)
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Event event;
+    @Column(name = "user_name", nullable = false)
+    private String userName;
+
+    @Column(name = "phone_num", nullable = false)
+    private String phoneNum;
+
+    //    @JoinColumn(name = "event_idx", nullable = false)
+//    @ManyToOne(fetch = FetchType.LAZY)
+    private String eventName;
 }

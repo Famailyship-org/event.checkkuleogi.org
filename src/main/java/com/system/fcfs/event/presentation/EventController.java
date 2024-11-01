@@ -1,7 +1,7 @@
 package com.system.fcfs.event.presentation;
 
-import com.system.fcfs.event.dto.response.GetWinnerResponseDTO;
 import com.system.fcfs.event.dto.request.PostEventRequestDTO;
+import com.system.fcfs.event.dto.response.GetWinnerResponseDTO;
 import com.system.fcfs.event.service.EventService;
 import com.system.fcfs.global.domain.response.CommonResponseEntity;
 import lombok.RequiredArgsConstructor;
@@ -21,12 +21,18 @@ public class EventController {
 
     @PostMapping("/attempt")
     public CommonResponseEntity requestEvent(@RequestBody PostEventRequestDTO postEventRequestDTO) {
+        // userId는 토큰 값을 활용하여 가져오기
         return success(couponService.addQueue(postEventRequestDTO));
     }
 
     @GetMapping("/winner/{eventName}")
-    public CommonResponseEntity<List<GetWinnerResponseDTO>> getWinner(@PathVariable String eventName) {
-        return success(couponService.getTop100Winners(eventName));
+    public CommonResponseEntity<List<GetWinnerResponseDTO>> processScheduledQueue(@PathVariable String eventName) {
+        return success(couponService.processScheduledQueue(eventName));
     }
+
+//    @GetMapping("/winner/{eventName}")
+//    public CommonResponseEntity<List<GetWinnerResponseDTO>> getWinner() {
+//        return success(couponService.processScheduledQueue(eventName));
+//    }
 }
 

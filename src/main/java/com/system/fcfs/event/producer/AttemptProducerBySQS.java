@@ -3,14 +3,18 @@ package com.system.fcfs.event.producer;
 import com.system.fcfs.event.consumer.SqsMessageListener;
 import com.system.fcfs.event.domain.Winner;
 import com.system.fcfs.event.dto.request.PostEventRequestDTO;
+import com.system.fcfs.event.implementation.manager.EventMangerT;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+
 @Repository("sqsAttemptRepository")
 @RequiredArgsConstructor
+@Log4j2
 public class AttemptProducerBySQS implements AttemptProducer {
     private static final String HYPER_LOG_LOG_KEY = "userPhoneCheck";
     private final SqsMessageSender sqsMessageSender;
@@ -26,7 +30,7 @@ public class AttemptProducerBySQS implements AttemptProducer {
 
     @Override
     public Boolean validRequest(PostEventRequestDTO postEventRequestDTO) {
-        String uniqueKey = postEventRequestDTO.userId() + ":" + postEventRequestDTO.eventName();
+        String uniqueKey = postEventRequestDTO.getUserName() + ":" + postEventRequestDTO.getTimestamp();
 
         // Redis HyperLogLog에 추가하고, 추가 전후 크기 비교
         Long previousCount = redisTemplate.opsForHyperLogLog().size(HYPER_LOG_LOG_KEY);
@@ -39,7 +43,11 @@ public class AttemptProducerBySQS implements AttemptProducer {
 
     @Override
     public Boolean addQueue(PostEventRequestDTO postEventRequestDTO) {
+        String time = java.time.LocalDateTime.now().toString();
+        postEventRequestDTO.setTimeStamp(time);
         String message = postEventRequestDTO.toString();
+        log.info("Send message to SQS: {}", message);
         return sqsMessageSender.sendMessage(message) != null;
     }
+
 }
