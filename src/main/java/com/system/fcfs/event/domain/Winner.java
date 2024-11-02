@@ -19,8 +19,8 @@ public class Winner {
     // 당첨자는 하나의 응모 시도와 일대일 관계
 //    @ManyToOne(fetch = FetchType.LAZY)
 //    @JoinColumn(name = "attempt_idx", nullable = false)
-    @Column(name = "attempt_idx", nullable = false)
-    private Long attemptIdx;
+//    @Column(name = "attempt_idx", nullable = false)
+//    private Long attemptIdx;
 
     @Column(name = "timestamp", nullable = false)
     private String timeStamp;
@@ -33,5 +33,9 @@ public class Winner {
 
     //    @JoinColumn(name = "event_idx", nullable = false)
 //    @ManyToOne(fetch = FetchType.LAZY)
+    @Column(name = "event_name", nullable = false)
     private String eventName;
+
+    @Column(name = "uuid", nullable = false)
+    private String uuid;
 }

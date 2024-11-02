@@ -1,6 +1,7 @@
 package com.system.fcfs.event.service;
 
 import com.system.fcfs.event.domain.Winner;
+import com.system.fcfs.event.dto.request.GetWinnerRequestDTO;
 import com.system.fcfs.event.dto.request.PostEventRequestDTO;
 import com.system.fcfs.event.dto.response.GetWinnerResponseDTO;
 import com.system.fcfs.event.exception.DuplicatedException;
@@ -19,13 +20,13 @@ public class EventService {
     private final AttemptProducer attemptProducer;
     private final EventMangerT eventMangerT;
 
-    public EventService(@Qualifier("sqsAttemptRepository") AttemptProducer attemptProducer, EventMangerT eventMangerT) {
+    public EventService(@Qualifier("redisAttemptRepository") AttemptProducer attemptProducer, EventMangerT eventMangerT) {
         this.attemptProducer = attemptProducer;
         this.eventMangerT = eventMangerT;
     }
 
     public Boolean addQueue(PostEventRequestDTO postEventRequestDTO) {
-        if (!attemptProducer.validRequest(postEventRequestDTO)) {
+        if (attemptProducer.validRequest(postEventRequestDTO)) {
             throw new DuplicatedException("중복 응모입니다.");
         }
         return attemptProducer.addQueue(postEventRequestDTO);
@@ -34,5 +35,10 @@ public class EventService {
     public List<GetWinnerResponseDTO> processScheduledQueue(String eventName) {
         List<Winner> winners = attemptProducer.getTop100AndUpdateQueue(eventName);
         return eventMangerT.toWinnerResponseDTO(winners);
+    }
+
+    public GetWinnerResponseDTO getWinner(GetWinnerRequestDTO getWinnerRequestDTO) {
+            Winner winner = attemptProducer.getWinner(getWinnerRequestDTO);
+            return eventMangerT.toWinnerResponseDTO(winner);
     }
 }

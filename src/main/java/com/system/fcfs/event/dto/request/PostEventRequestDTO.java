@@ -6,7 +6,6 @@ import lombok.ToString;
 
 @Builder
 @Getter
-@ToString
 public class PostEventRequestDTO {
     private final String userName;
     private String timestamp;
@@ -18,10 +17,11 @@ public class PostEventRequestDTO {
         return "{" +
                 "\"userName\":\"" + userName + "\"," +
                 "\"phoneNum\":\"" + phoneNum + "\"," +
-                "\"eventName\":\"" + eventName + "\"" +
-                "\"eventName\":\"" + timestamp + "\"" +
+                "\"eventName\":\"" + eventName + "\"," +
+                "\"timeStamp\":\"" + timestamp + "\"" +
                 "}";
     }
+
 
     public String setTimeStamp(String timeStamp) {
         return this.timestamp = timeStamp;

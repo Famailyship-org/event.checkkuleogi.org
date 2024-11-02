@@ -2,8 +2,8 @@ package com.system.fcfs.event.producer;
 
 import com.system.fcfs.event.consumer.SqsMessageListener;
 import com.system.fcfs.event.domain.Winner;
+import com.system.fcfs.event.dto.request.GetWinnerRequestDTO;
 import com.system.fcfs.event.dto.request.PostEventRequestDTO;
-import com.system.fcfs.event.implementation.manager.EventMangerT;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -48,6 +48,11 @@ public class AttemptProducerBySQS implements AttemptProducer {
         String message = postEventRequestDTO.toString();
         log.info("Send message to SQS: {}", message);
         return sqsMessageSender.sendMessage(message) != null;
+    }
+
+    @Override
+    public Winner getWinner(GetWinnerRequestDTO getWinnerRequestDTO) {
+        return null;
     }
 
 }

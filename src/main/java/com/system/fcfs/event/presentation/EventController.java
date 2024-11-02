@@ -1,5 +1,6 @@
 package com.system.fcfs.event.presentation;
 
+import com.system.fcfs.event.dto.request.GetWinnerRequestDTO;
 import com.system.fcfs.event.dto.request.PostEventRequestDTO;
 import com.system.fcfs.event.dto.response.GetWinnerResponseDTO;
 import com.system.fcfs.event.service.EventService;
@@ -19,20 +20,22 @@ import static com.system.fcfs.global.domain.response.CommonResponseEntity.succes
 public class EventController {
     private final EventService couponService;
 
+    @CrossOrigin(origins = "http://localhost:3000", methods = {RequestMethod.POST})
     @PostMapping("/attempt")
     public CommonResponseEntity requestEvent(@RequestBody PostEventRequestDTO postEventRequestDTO) {
         // userId는 토큰 값을 활용하여 가져오기
         return success(couponService.addQueue(postEventRequestDTO));
     }
 
-    @GetMapping("/winner/{eventName}")
+    @GetMapping("/winners/{eventName}")
     public CommonResponseEntity<List<GetWinnerResponseDTO>> processScheduledQueue(@PathVariable String eventName) {
         return success(couponService.processScheduledQueue(eventName));
     }
 
-//    @GetMapping("/winner/{eventName}")
-//    public CommonResponseEntity<List<GetWinnerResponseDTO>> getWinner() {
-//        return success(couponService.processScheduledQueue(eventName));
-//    }
+    @CrossOrigin(origins = "http://localhost:3000", methods = {RequestMethod.POST})
+    @PostMapping("/winner")
+    public CommonResponseEntity<GetWinnerResponseDTO> getWinner(@RequestBody GetWinnerRequestDTO getWinnerRequestDTO) {
+        return success(couponService.getWinner(getWinnerRequestDTO));
+    }
 }
 
