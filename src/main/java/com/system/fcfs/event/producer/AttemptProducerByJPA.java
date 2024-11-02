@@ -2,6 +2,7 @@ package com.system.fcfs.event.producer;
 
 import com.system.fcfs.event.domain.Attempt;
 import com.system.fcfs.event.domain.Winner;
+import com.system.fcfs.event.dto.request.GetWinnerRequestDTO;
 import com.system.fcfs.event.dto.request.PostEventRequestDTO;
 import com.system.fcfs.event.repository.AttemptJpaRepository;
 import com.system.fcfs.global.domain.exception.NotFoundException;
@@ -15,6 +16,10 @@ import java.util.List;
 @Repository("jpaWinnerRepository")
 @RequiredArgsConstructor
 public class AttemptProducerByJPA implements AttemptProducer {
+    @Override
+    public Winner getWinner(GetWinnerRequestDTO getWinnerRequestDTO) {
+        return null;
+    }
 
     private final AttemptJpaRepository attemptJpaRepository;
 

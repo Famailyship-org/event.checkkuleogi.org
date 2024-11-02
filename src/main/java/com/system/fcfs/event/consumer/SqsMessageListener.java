@@ -59,7 +59,6 @@ public class SqsMessageListener {
                     winners.add(winner);
                 }
             }
-            // 메시지가 남아있지 않으면 루프 종료
             if (messages.isEmpty()) {
                 break;
             }
@@ -69,9 +68,7 @@ public class SqsMessageListener {
 
     public List<Attempt> receiveAndSaveAllAttempts() {
         List<Attempt> attempts = new ArrayList<>();
-
         while (true) {
-            // AWS SQS는 한 번에 최대 10개의 메시지만 가져올 수 있으므로 maxNumberOfMessages를 10으로 설정
             ReceiveMessageRequest receiveRequest = ReceiveMessageRequest.builder()
                     .queueUrl(queueUrl)
                     .maxNumberOfMessages(10) // 한 번에 가져올 최대 메시지 수
@@ -121,6 +118,7 @@ public class SqsMessageListener {
     private Winner parseMessageBody(Message message) {
         try {
             JsonNode bodyNode = objectMapper.readTree(message.body());
+            log.info("bodyNode: {}", bodyNode);
             String timeStamp = bodyNode.get("timeStamp").asText();
             String eventName = bodyNode.get("eventName").asText();
             String phoneNum = bodyNode.get("phoneNum").asText();
@@ -133,7 +131,7 @@ public class SqsMessageListener {
                     .eventName(eventName)
                     .build();
         } catch (Exception e) {
-            throw new IllegalArgumentException("메시지 파싱에 실패했습니다. message: " + message.body(), e);
+            throw new IllegalArgumentException("Winner 메시지 파싱에 실패했습니다. message: " + message.body(), e);
         }
     }
 
