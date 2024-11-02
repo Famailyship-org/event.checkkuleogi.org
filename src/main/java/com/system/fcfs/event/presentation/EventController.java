@@ -23,15 +23,16 @@ public class EventController {
     @CrossOrigin(origins = "http://localhost:3000", methods = {RequestMethod.POST})
     @PostMapping("/attempt")
     public CommonResponseEntity requestEvent(@RequestBody PostEventRequestDTO postEventRequestDTO) {
-        // userId는 토큰 값을 활용하여 가져오기
         return success(couponService.addQueue(postEventRequestDTO));
     }
 
+    // 스케줄 적용 컨트롤러
     @GetMapping("/winners/{eventName}")
     public CommonResponseEntity<List<GetWinnerResponseDTO>> processScheduledQueue(@PathVariable String eventName) {
         return success(couponService.processScheduledQueue(eventName));
     }
 
+    // 당첨자 조회
     @CrossOrigin(origins = "http://localhost:3000", methods = {RequestMethod.POST})
     @PostMapping("/winner")
     public CommonResponseEntity<GetWinnerResponseDTO> getWinner(@RequestBody GetWinnerRequestDTO getWinnerRequestDTO) {

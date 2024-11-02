@@ -56,7 +56,6 @@ public class AttemptProducerByRedis implements AttemptProducer {
                 .collect(Collectors.toList());
 
         remainingResult.forEach(winnerStr -> {
-            String uuid = UUID.randomUUID().toString();  // 고유한 UUID 생성
             double score = redisTemplate.opsForZSet().score(eventName, winnerStr); // timestamp 값 가져오기
 
             // Attempt 객체에 UUID, 이름, 전화번호, timestamp 추가
@@ -69,6 +68,7 @@ public class AttemptProducerByRedis implements AttemptProducer {
             attemptJpaRepository.save(attempt);
         });
 
+        // 마지막에 Redis 삭제
         redisTemplate.delete(eventName);
         return winners;
     }
