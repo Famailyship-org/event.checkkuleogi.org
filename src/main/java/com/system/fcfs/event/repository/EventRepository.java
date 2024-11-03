@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public interface EventRepository extends JpaRepository<Event, Long> {
 
-    @Query("SELECT e FROM Event e WHERE e.createdDate = :yesterday")
+    @Query("SELECT e FROM Event e WHERE e.eventDate = :yesterday")
     Optional<Event> findPreviousDayEvent(@Param("yesterday") LocalDate yesterday);
 
     Optional<Event> findByEventType(EventType eventType);

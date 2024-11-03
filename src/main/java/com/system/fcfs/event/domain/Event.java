@@ -25,11 +25,6 @@ public class Event {
     @Column(nullable = false)
     private EventType eventType;
 
-    @Column(nullable = false, updatable = false)
-    private LocalDate createdDate;
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdDate = LocalDate.now();
-    }
+    @Column(nullable = false)
+    private LocalDate eventDate;
 }

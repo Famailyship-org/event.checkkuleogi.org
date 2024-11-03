@@ -30,5 +30,4 @@ public class RedisZsetReader {
             attemptProducerByRedis.getTop100AndUpdateQueue(eventName);
         });
     }
-
 }
