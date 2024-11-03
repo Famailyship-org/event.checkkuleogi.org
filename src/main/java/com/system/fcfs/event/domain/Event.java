@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Entity
 @Builder
 @NoArgsConstructor
@@ -22,4 +24,12 @@ public class Event {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private EventType eventType;
+
+    @Column(nullable = false, updatable = false)
+    private LocalDate createdDate;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdDate = LocalDate.now();
+    }
 }
