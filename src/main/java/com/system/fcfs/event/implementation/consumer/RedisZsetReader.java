@@ -1,4 +1,4 @@
-package com.system.fcfs.event.consumer;
+package com.system.fcfs.event.implementation.consumer;
 
 import com.system.fcfs.event.domain.Event;
 import com.system.fcfs.event.producer.AttemptProducerByRedis;
