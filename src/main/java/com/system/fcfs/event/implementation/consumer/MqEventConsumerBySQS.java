@@ -4,9 +4,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.system.fcfs.event.domain.Attempt;
 import com.system.fcfs.event.domain.Winner;
-import com.system.fcfs.event.repository.AttemptJpaRepository;
+import com.system.fcfs.event.dto.request.GetWinnerRequestDTO;
+import com.system.fcfs.event.repository.JpaEventRepository;
 import com.system.fcfs.event.repository.EventRepository;
 import com.system.fcfs.event.repository.WinnerRepository;
+import com.system.fcfs.event.service.EventConsumer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,13 +25,22 @@ import java.util.List;
 @Log4j2
 @Component
 @RequiredArgsConstructor
-public class SqsMessageListener {
+public class MqEventConsumerBySQS implements EventConsumer {
+    @Override
+    public List<Winner> getTop100AndUpdateQueue(String eventName) {
+        return List.of();
+    }
+
+    @Override
+    public Winner getWinner(GetWinnerRequestDTO getWinnerRequestDTO) {
+        return null;
+    }
 
     private final SqsClient sqsClient;
     private final ObjectMapper objectMapper;
     private final WinnerRepository winnerRepository;
     private final EventRepository eventRepository;
-    private final AttemptJpaRepository attemptJpaRepository;
+    private final JpaEventRepository jpaEventRepository;
 
     @Value("${spring.cloud.aws.sqs.queue-url}")
     private String queueUrl;
@@ -81,7 +92,7 @@ public class SqsMessageListener {
             for (Message message : messages) {
                 Attempt attempt = parseAttemptMessageBody(message);
                 if (attempt != null) {
-                    attemptJpaRepository.save(attempt);
+                    jpaEventRepository.save(attempt);
                     deleteMessageFromQueue(message);
                     attempts.add(attempt);
                 }

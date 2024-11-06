@@ -1,9 +1,10 @@
-package com.system.fcfs.event.producer;
+package com.system.fcfs.event.implementation.producer;
 
-import com.system.fcfs.event.implementation.consumer.SqsMessageListener;
+import com.system.fcfs.event.implementation.consumer.MqEventConsumerBySQS;
 import com.system.fcfs.event.domain.Winner;
 import com.system.fcfs.event.dto.request.GetWinnerRequestDTO;
 import com.system.fcfs.event.dto.request.PostEventRequestDTO;
+import com.system.fcfs.event.service.EventProducer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -15,16 +16,16 @@ import java.util.List;
 @Repository("sqsAttemptRepository")
 @RequiredArgsConstructor
 @Log4j2
-public class AttemptProducerBySQS implements AttemptProducer {
+public class EventProducerBySQS implements EventProducer {
     private static final String HYPER_LOG_LOG_KEY = "userPhoneCheck";
     private final SqsMessageSender sqsMessageSender;
-    private final SqsMessageListener sqsMessageListener;
+    private final MqEventConsumerBySQS mqEventConsumerBySQS;
     private final RedisTemplate<String, String> redisTemplate;
 
     @Override
     public List<Winner> getTop100AndUpdateQueue(String eventName) {
-        List<Winner> winners = sqsMessageListener.receiveAndSaveWinners();
-        sqsMessageListener.receiveAndSaveAllAttempts();
+        List<Winner> winners = mqEventConsumerBySQS.receiveAndSaveWinners();
+        mqEventConsumerBySQS.receiveAndSaveAllAttempts();
         return winners;
     }
 

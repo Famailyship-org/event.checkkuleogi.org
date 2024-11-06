@@ -1,4 +1,4 @@
-package com.system.fcfs.event.producer;
+package com.system.fcfs.event.implementation.producer;
 
 import io.awspring.cloud.sqs.operations.SendResult;
 import io.awspring.cloud.sqs.operations.SqsTemplate;

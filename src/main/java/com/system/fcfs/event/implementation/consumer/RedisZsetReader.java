@@ -1,10 +1,9 @@
 package com.system.fcfs.event.implementation.consumer;
 
 import com.system.fcfs.event.domain.Event;
-import com.system.fcfs.event.producer.AttemptProducerByRedis;
+import com.system.fcfs.event.implementation.producer.EventProducerByRedis;
 import com.system.fcfs.event.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +15,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class RedisZsetReader {
 
-    private final AttemptProducerByRedis attemptProducerByRedis;
+    private final EventProducerByRedis attemptProducerByRedis;
     private final EventRepository eventRepository;
 
     @Scheduled(cron = "00 50 12 * * ?")

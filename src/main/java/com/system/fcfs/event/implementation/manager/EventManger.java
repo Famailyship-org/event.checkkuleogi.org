@@ -2,7 +2,7 @@ package com.system.fcfs.event.implementation.manager;
 
 import com.system.fcfs.event.domain.Winner;
 import com.system.fcfs.event.dto.response.GetWinnerResponseDTO;
-import com.system.fcfs.event.producer.AttemptProducer;
+import com.system.fcfs.event.service.EventProducer;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -14,11 +14,11 @@ import java.util.stream.Collectors;
 public class EventManger {
 
     private final RedisTemplate<String, String> redisTemplate;
-    private final AttemptProducer attemptProducer;
+    private final EventProducer eventProducer;
 
-    public EventManger(RedisTemplate<String, String> redisTemplate, @Qualifier("sqsAttemptRepository") AttemptProducer attemptProducer) {
+    public EventManger(RedisTemplate<String, String> redisTemplate, @Qualifier("sqsAttemptRepository") EventProducer eventProducer) {
         this.redisTemplate = redisTemplate;
-        this.attemptProducer = attemptProducer;
+        this.eventProducer = eventProducer;
     }
 
     public List<GetWinnerResponseDTO> toWinnerResponseDTO(List<Winner> winners) {
