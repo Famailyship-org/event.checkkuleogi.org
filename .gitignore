@@ -28,7 +28,6 @@ out/
 /src/main/resources/application-prod.yml
 application-prod.yml
 application.yml
-compose.yml
 prometheus.yml
 /test-script
 .gitattributes
@@ -46,3 +45,6 @@ nginx.conf
 
 ### VS Code ###
 .vscode/
+
+## CUSTOM ###
+.env
