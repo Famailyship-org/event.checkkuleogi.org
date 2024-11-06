@@ -1,6 +1,6 @@
 package com.system.fcfs.event.producer;
 
-import com.system.fcfs.event.consumer.SqsMessageListener;
+import com.system.fcfs.event.implementation.consumer.SqsMessageListener;
 import com.system.fcfs.event.domain.Winner;
 import com.system.fcfs.event.dto.request.GetWinnerRequestDTO;
 import com.system.fcfs.event.dto.request.PostEventRequestDTO;

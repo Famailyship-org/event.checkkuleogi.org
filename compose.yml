@@ -1,0 +1,143 @@
+services:
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
+    depends_on:
+      - prometheus
+    networks:
+      - monitoring
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: always
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--web.enable-lifecycle'
+    networks:
+      - monitoring
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: always
+    ports:
+      - "3310:3306"  # 외부에서 MySQL에 접근하기 위한 포트 3310, 내부 접근은 3306
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    volumes:
+      - mysql-data:/var/lib/mysql  # MySQL 데이터 볼륨
+    networks:
+      - monitoring
+
+  mysql-exporter:
+    container_name: mysql-exporter
+    image: prom/mysqld-exporter
+    command:
+      - "--mysqld.username=root:root"
+      - "--mysqld.address=mysql:3306"
+    ports:
+      - "9104:9104"
+    networks:
+      - monitoring
+    depends_on:
+      - mysql
+
+  # Spring 서버 설정
+  spring_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: spring_app
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/fcfs
+      - SPRING_DATASOURCE_USERNAME=${MYSQL_ROOT_PASSWORD}
+      - SPRING_DATASOURCE_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    networks:
+      - monitoring  # MySQL 네트워크에 연결
+    depends_on:
+      - mysql
+      - redis
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2G
+
+  redis:
+    image: redis:latest  # Redis 이미지 지정
+    container_name: redis
+    ports:
+      - 6379:6379
+    networks:
+      - monitoring
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+
+  redis-exporter:
+    container_name: redis-exporter
+    image: oliver006/redis_exporter:latest
+    environment:
+      - REDIS_ADDR=redis://redis:6379
+    ports:
+      - 9121:9121
+    networks:
+      - monitoring
+    restart: always
+
+  #  redis-exporter-elasticache:
+  #    container_name: redis-exporter-elasticache
+  #    image: oliver006/redis_exporter:latest
+  #    environment:
+  #      - REDIS_ADDR=redis://kkuleogi-redis-8lanix.serverless.apn2.cache.amazonaws.com:6379  # Elasticache Redis 엔드포인트로 수정
+  #    ports:
+  #      - 9122:9122  # Elasticache Redis Exporter에 대한 포트 (충돌 방지를 위해 9122로 지정)
+  #    networks:
+  #      - monitoring
+  #    restart: always
+
+  influxdb:
+    image: influxdb:1.8
+    container_name: influxdb
+    restart: always
+    ports:
+      - "8086:8086"  # InfluxDB의 기본 포트
+    volumes:
+      - influxdb-data:/var/lib/influxdb  # InfluxDB 데이터 볼륨
+    networks:
+      - monitoring
+    environment:
+      - INFLUXDB_DB=db
+
+volumes:
+  mysql-data:
+  grafana-data:
+  prometheus-data:
+  influxdb-data:  # InfluxDB 데이터 볼륨 추가
+
+networks:
+  monitoring:
+    driver: bridge
