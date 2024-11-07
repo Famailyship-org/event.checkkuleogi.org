@@ -1,7 +1,7 @@
 package com.system.fcfs.event.implementation.consumer;
 
 import com.system.fcfs.event.domain.Event;
-import com.system.fcfs.event.implementation.producer.EventProducerByRedis;
+import com.system.fcfs.event.implementation.producer.NoSqlEventProducerByRedis;
 import com.system.fcfs.event.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -15,7 +15,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class RedisZsetReader {
 
-    private final EventProducerByRedis attemptProducerByRedis;
+    private final NoSqlEventConsumerByRedis noSqlEventConsumerByRedis;
     private final EventRepository eventRepository;
 
     @Scheduled(cron = "00 50 12 * * ?")
@@ -26,7 +26,7 @@ public class RedisZsetReader {
 
         previousDayEvent.ifPresent(event -> {
             String eventName = event.getEventType().getName();
-            attemptProducerByRedis.getTop100AndUpdateQueue(eventName);
+            noSqlEventConsumerByRedis.consumeJobQ(eventName);
         });
     }
 }

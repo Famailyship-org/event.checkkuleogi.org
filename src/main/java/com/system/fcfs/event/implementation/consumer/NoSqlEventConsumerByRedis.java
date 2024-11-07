@@ -5,10 +5,11 @@ import com.system.fcfs.event.domain.Winner;
 import com.system.fcfs.event.dto.request.GetWinnerRequestDTO;
 import com.system.fcfs.event.repository.JpaEventRepository;
 import com.system.fcfs.event.repository.WinnerRepository;
-import com.system.fcfs.event.service.NoSQLEventConsumer;
+import com.system.fcfs.event.service.EventConsumer;
 import com.system.fcfs.global.domain.exception.NotFoundException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -17,8 +18,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Log4j2
-@Repository("redisEventConsumer")
-public class NoSqlEventConsumerByRedis implements NoSQLEventConsumer {
+@Component("noSqlEventConsumerByRedis")
+public class NoSqlEventConsumerByRedis implements EventConsumer {
 
     private final RedisTemplate<String, String> redisTemplate;
     private final JpaEventRepository jpaEventRepository;
@@ -31,9 +32,22 @@ public class NoSqlEventConsumerByRedis implements NoSQLEventConsumer {
     }
 
     @Override
-    public List<Winner> getTop100AndUpdateQueue(String eventName) {
+    public Winner getWinner(GetWinnerRequestDTO getWinnerRequestDTO) {
+        return winnerRepository.findByUserNameAndPhoneNum(getWinnerRequestDTO.userName(),
+                getWinnerRequestDTO.phoneNum()).orElseThrow(() -> new NotFoundException("당첨자가 없습니다."));
+    }
+
+    @Override
+    public Boolean consumeJobQ(String eventName) {
         Set<String> top100Result = redisTemplate.opsForZSet().range(eventName, 0, 99);
+
+        if (top100Result == null || top100Result.isEmpty()) {
+            throw new NotFoundException("당첨자가 없습니다.");
+        }
         Set<String> remainingResult = redisTemplate.opsForZSet().range(eventName, 100, -1);
+        if (remainingResult == null || remainingResult.isEmpty()) {
+            throw new NotFoundException("당첨자가 없습니다.");
+        }
 
         log.info("Top 100 result: {}", top100Result);
         log.info("Remaining result: {}", remainingResult);
@@ -69,12 +83,6 @@ public class NoSqlEventConsumerByRedis implements NoSQLEventConsumer {
             jpaEventRepository.save(attempt);
         });
         redisTemplate.delete(eventName);
-        return winners;
-    }
-
-    @Override
-    public Winner getWinner(GetWinnerRequestDTO getWinnerRequestDTO) {
-        return winnerRepository.findByUserNameAndPhoneNum(getWinnerRequestDTO.userName(),
-                getWinnerRequestDTO.phoneNum()).orElseThrow(() -> new NotFoundException("당첨자가 없습니다."));
+        return true;
     }
 }

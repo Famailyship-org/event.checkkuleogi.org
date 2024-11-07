@@ -18,4 +18,6 @@ public interface JpaEventRepository extends JpaRepository<Attempt, Long> {
 
     @Query("SELECT CASE WHEN COUNT(a) > 0 THEN TRUE ELSE FALSE END FROM Attempt a WHERE a.userName = :userId")
     boolean existsByUserId(@Param("userId") String userId);
+
+    void save(Winner winner);
 }

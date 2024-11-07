@@ -4,12 +4,14 @@ import com.system.fcfs.event.domain.Attempt;
 import com.system.fcfs.event.dto.request.PostEventRequestDTO;
 import com.system.fcfs.event.repository.JpaEventRepository;
 import com.system.fcfs.event.service.EventProducer;
+import com.system.fcfs.global.domain.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
-@Repository("jpaWinnerRepository")
+@Component("rdbEventProducerByJpa")
 @RequiredArgsConstructor
-public class EventProducerByJPA implements EventProducer {
+public class RdbEventProducerByJpa implements EventProducer {
 
     private final JpaEventRepository jpaEventRepository;
 
@@ -19,7 +21,10 @@ public class EventProducerByJPA implements EventProducer {
     }
 
     @Override
-    public Boolean addQueue(PostEventRequestDTO postEventRequestDTO) {
+    public Boolean addJobQ(PostEventRequestDTO postEventRequestDTO) {
+        if(validRequest(postEventRequestDTO)){
+            throw new NotFoundException("중복 응모입니다.");
+        }
         String time = java.time.LocalDateTime.now().toString();
         jpaEventRepository.save(Attempt.builder()
                 .userName(postEventRequestDTO.getUserName())
