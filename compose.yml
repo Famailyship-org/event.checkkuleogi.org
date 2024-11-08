@@ -91,11 +91,11 @@ services:
     networks:
       - monitoring
     restart: always
-    deploy:
-      resources:
-        limits:
-          cpus: "1.0"
-          memory: 1G
+#    deploy:
+#      resources:
+#        limits:
+#          cpus: "1.0"
+#          memory: 1G
 
   redis-exporter:
     container_name: redis-exporter

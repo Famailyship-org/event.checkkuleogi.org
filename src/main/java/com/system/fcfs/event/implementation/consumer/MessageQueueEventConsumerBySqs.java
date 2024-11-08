@@ -4,9 +4,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.system.fcfs.event.domain.Attempt;
 import com.system.fcfs.event.domain.Winner;
-import com.system.fcfs.event.repository.AttemptJpaRepository;
-import com.system.fcfs.event.repository.EventRepository;
+import com.system.fcfs.event.dto.request.GetWinnerRequestDTO;
+import com.system.fcfs.event.repository.AttemptRepository;
 import com.system.fcfs.event.repository.WinnerRepository;
+import com.system.fcfs.event.service.EventConsumer;
+import com.system.fcfs.global.domain.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,18 +23,29 @@ import java.util.List;
 
 
 @Log4j2
-@Component
+@Component("messageQueueEventConsumerBySqs")
 @RequiredArgsConstructor
-public class SqsMessageListener {
-
+public class MessageQueueEventConsumerBySqs implements EventConsumer {
     private final SqsClient sqsClient;
     private final ObjectMapper objectMapper;
     private final WinnerRepository winnerRepository;
-    private final EventRepository eventRepository;
-    private final AttemptJpaRepository attemptJpaRepository;
+    private final AttemptRepository attemptRepository;
 
     @Value("${spring.cloud.aws.sqs.queue-url}")
     private String queueUrl;
+
+    @Override
+    public Winner getWinner(GetWinnerRequestDTO getWinnerRequestDTO) {
+        return winnerRepository.findByUserNameAndPhoneNum(getWinnerRequestDTO.userName(), getWinnerRequestDTO.phoneNum())
+                .orElseThrow(() -> new NotFoundException("당첨자가 존재하지 않습니다. "));
+    }
+
+    @Override
+    public Boolean consumeJobQ(String eventName) {
+        receiveAndSaveWinners();
+        receiveAndSaveAllAttempts();
+        return true;
+    }
 
     public List<Winner> receiveAndSaveWinners() {
         List<Winner> winners = new ArrayList<>();
@@ -49,6 +62,9 @@ public class SqsMessageListener {
                     .build();
 
             List<Message> messages = sqsClient.receiveMessage(receiveRequest).messages();
+            if (messages.isEmpty()) {
+                throw new NotFoundException("메시지가 큐에 존재하지 않습니다. ");
+            }
             fetchedMessages += messages.size();
 
             for (Message message : messages) {
@@ -66,7 +82,7 @@ public class SqsMessageListener {
         return winners;
     }
 
-    public List<Attempt> receiveAndSaveAllAttempts() {
+    public Boolean receiveAndSaveAllAttempts() {
         List<Attempt> attempts = new ArrayList<>();
         while (true) {
             ReceiveMessageRequest receiveRequest = ReceiveMessageRequest.builder()
@@ -74,25 +90,24 @@ public class SqsMessageListener {
                     .maxNumberOfMessages(10) // 한 번에 가져올 최대 메시지 수
                     .waitTimeSeconds(20) // Long Polling 사용
                     .build();
-
             List<Message> messages = sqsClient.receiveMessage(receiveRequest).messages();
-
+            if (messages.isEmpty()) {
+                throw new NotFoundException("메시지가 큐에 존재하지 않습니다. ");
+            }
             // 메시지를 처리하고 저장
             for (Message message : messages) {
                 Attempt attempt = parseAttemptMessageBody(message);
                 if (attempt != null) {
-                    attemptJpaRepository.save(attempt);
+                    attemptRepository.save(attempt);
                     deleteMessageFromQueue(message);
                     attempts.add(attempt);
                 }
             }
-
-            // 메시지가 남아있지 않으면 루프 종료
             if (messages.isEmpty()) {
                 break;
             }
         }
-        return attempts;
+        return true;
     }
 
     private Attempt parseAttemptMessageBody(Message message) {
@@ -102,7 +117,6 @@ public class SqsMessageListener {
             String eventName = bodyNode.get("event").asText();
             String phoneNum = bodyNode.get("phoneNum").asText();
             String userName = bodyNode.get("userName").asText();
-
 
             return Attempt.builder()
                     .timeStamp(timeStamp)

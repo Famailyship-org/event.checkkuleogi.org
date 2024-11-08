@@ -1,15 +1,15 @@
-package com.system.fcfs.event.producer;
+package com.system.fcfs.event.implementation.consumer;
 
 import com.system.fcfs.event.domain.Attempt;
 import com.system.fcfs.event.domain.Winner;
 import com.system.fcfs.event.dto.request.GetWinnerRequestDTO;
-import com.system.fcfs.event.dto.request.PostEventRequestDTO;
-import com.system.fcfs.event.repository.AttemptJpaRepository;
+import com.system.fcfs.event.repository.AttemptRepository;
 import com.system.fcfs.event.repository.WinnerRepository;
+import com.system.fcfs.event.service.EventConsumer;
 import com.system.fcfs.global.domain.exception.NotFoundException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Set;
@@ -17,22 +17,36 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Log4j2
-@Repository("redisAttemptRepository")
-public class AttemptProducerByRedis implements AttemptProducer {
+@Component("noSqlEventConsumerByRedis")
+public class NoSqlEventConsumerByRedis implements EventConsumer {
 
     private final RedisTemplate<String, String> redisTemplate;
-    private final AttemptJpaRepository attemptJpaRepository;
+    private final AttemptRepository attemptRepository;
     private final WinnerRepository winnerRepository;
 
-    public AttemptProducerByRedis(RedisTemplate<String, String> redisTemplate, AttemptJpaRepository attemptJpaRepository, WinnerRepository winnerRepository) {
+    public NoSqlEventConsumerByRedis(RedisTemplate<String, String> redisTemplate, AttemptRepository attemptRepository, WinnerRepository winnerRepository) {
         this.redisTemplate = redisTemplate;
-        this.attemptJpaRepository = attemptJpaRepository;
+        this.attemptRepository = attemptRepository;
         this.winnerRepository = winnerRepository;
     }
 
-    public List<Winner> getTop100AndUpdateQueue(String eventName) {
+    @Override
+    public Winner getWinner(GetWinnerRequestDTO getWinnerRequestDTO) {
+        return winnerRepository.findByUserNameAndPhoneNum(getWinnerRequestDTO.userName(),
+                getWinnerRequestDTO.phoneNum()).orElseThrow(() -> new NotFoundException("당첨자가 없습니다."));
+    }
+
+    @Override
+    public Boolean consumeJobQ(String eventName) {
         Set<String> top100Result = redisTemplate.opsForZSet().range(eventName, 0, 99);
+
+        if (top100Result == null || top100Result.isEmpty()) {
+            throw new NotFoundException("당첨자가 없습니다.");
+        }
         Set<String> remainingResult = redisTemplate.opsForZSet().range(eventName, 100, -1);
+        if (remainingResult == null || remainingResult.isEmpty()) {
+            throw new NotFoundException("당첨자가 없습니다.");
+        }
 
         log.info("Top 100 result: {}", top100Result);
         log.info("Remaining result: {}", remainingResult);
@@ -50,14 +64,13 @@ public class AttemptProducerByRedis implements AttemptProducer {
                             .timeStamp(Double.toString(score))
                             .eventName(eventName)
                             .build();
-                    winnerRepository.save(winner);
                     return winner;
                 })
                 .collect(Collectors.toList());
+        winnerRepository.saveAll(winners);
 
-        remainingResult.forEach(winnerStr -> {
+        List<Attempt> attempts = remainingResult.stream().map(winnerStr -> {
             double score = redisTemplate.opsForZSet().score(eventName, winnerStr); // timestamp 값 가져오기
-
             // Attempt 객체에 UUID, 이름, 전화번호, timestamp 추가
             Attempt attempt = Attempt.builder()
                     .userName(winnerStr.split("\\|")[0])
@@ -65,48 +78,10 @@ public class AttemptProducerByRedis implements AttemptProducer {
                     .timeStamp(Double.toString(score))
                     .eventName(eventName)
                     .build();
-            attemptJpaRepository.save(attempt);
-        });
-
-        // 마지막에 Redis 삭제
+            return attempt;
+        }).collect(Collectors.toList());
+        attemptRepository.saveAll(attempts);
         redisTemplate.delete(eventName);
-        return winners;
-    }
-
-
-
-    @Override
-    public Boolean validRequest(PostEventRequestDTO postEventRequestDTO) {
-        String uniqueKey = postEventRequestDTO.getUserName() + "|" + postEventRequestDTO.getPhoneNum();
-        Double score = redisTemplate.opsForZSet().score(postEventRequestDTO.getEventName(), uniqueKey);
-        return score != null; // score가 null이 아니면 중복된 멤버
-    }
-    @Override
-    public Boolean addQueue(PostEventRequestDTO postEventRequestDTO) {
-        log.info("Request: {}", postEventRequestDTO);
-        double time = System.currentTimeMillis();
-
-        try {
-            boolean isAdded = redisTemplate.opsForZSet().add(
-                    postEventRequestDTO.getEventName(),
-                    postEventRequestDTO.getUserName() + "|" + postEventRequestDTO.getPhoneNum(),
-                    time
-            );
-            if (!isAdded) {
-                log.error("이벤트 추가 실패: {}", postEventRequestDTO.getEventName());
-                return false;
-            }
-        } catch (Exception e) {
-            log.error("레디스 Zset 추가 시 실패", e);
-            throw new RuntimeException("레디스 데이터 추가시 실패", e);
-        }
-
         return true;
-    }
-
-    @Override
-    public Winner getWinner(GetWinnerRequestDTO getWinnerRequestDTO) {
-        return winnerRepository.findByUserNameAndPhoneNum(getWinnerRequestDTO.userName(),
-                getWinnerRequestDTO.phoneNum()).orElseThrow(() -> new NotFoundException("당첨자가 없습니다."));
     }
 }
