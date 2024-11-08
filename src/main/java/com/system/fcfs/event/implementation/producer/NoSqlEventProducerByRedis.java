@@ -21,7 +21,7 @@ public class NoSqlEventProducerByRedis implements EventProducer {
     public Boolean validRequest(PostEventRequestDTO postEventRequestDTO) {
         String uniqueKey = postEventRequestDTO.getUserName() + "|" + postEventRequestDTO.getPhoneNum();
         Double score = redisTemplate.opsForZSet().score(postEventRequestDTO.getEventName(), uniqueKey);
-        return score != null; // score가 null이 아니면 중복된 멤버
+        return score != null;
     }
 
     @Override
@@ -31,6 +31,7 @@ public class NoSqlEventProducerByRedis implements EventProducer {
         if(validRequest(postEventRequestDTO)){
             throw new NotFoundException("중복 응모입니다.");
         }
+
         double time = System.currentTimeMillis();
         try {
             boolean isAdded = redisTemplate.opsForZSet().add(

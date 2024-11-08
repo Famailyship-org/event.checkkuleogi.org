@@ -26,6 +26,7 @@ public class EventController {
     // 스케줄 적용 컨트롤러
     @GetMapping("/winners/{eventName}")
     public CommonResponseEntity<Boolean> processScheduledQueue(@PathVariable String eventName) {
+
         return success(eventUseCase.consumeJobQ(eventName));
     }
 

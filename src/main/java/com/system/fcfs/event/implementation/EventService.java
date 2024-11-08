@@ -18,8 +18,8 @@ public class EventService implements EventUseCase {
     private final EventProducer eventProducer;
     private final DtoMapper dtoMapper;
 
-    public EventService(@Qualifier("rdbEventProducerByJpa") EventProducer eventProducer
-            , @Qualifier("rdbEventConsumerByJpa") EventConsumer eventConsumer, DtoMapper dtoMapper) {
+    public EventService(@Qualifier("noSqlEventProducerByRedis") EventProducer eventProducer
+            , @Qualifier("noSqlEventConsumerByRedis") EventConsumer eventConsumer, DtoMapper dtoMapper) {
         this.eventConsumer = eventConsumer;
         this.eventProducer = eventProducer;
         this.dtoMapper = dtoMapper;

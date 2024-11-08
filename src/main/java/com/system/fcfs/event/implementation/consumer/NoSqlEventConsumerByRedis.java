@@ -64,14 +64,13 @@ public class NoSqlEventConsumerByRedis implements EventConsumer {
                             .timeStamp(Double.toString(score))
                             .eventName(eventName)
                             .build();
-                    winnerRepository.save(winner);
                     return winner;
                 })
                 .collect(Collectors.toList());
+        winnerRepository.saveAll(winners);
 
-        remainingResult.forEach(winnerStr -> {
+        List<Attempt> attempts = remainingResult.stream().map(winnerStr -> {
             double score = redisTemplate.opsForZSet().score(eventName, winnerStr); // timestamp 값 가져오기
-
             // Attempt 객체에 UUID, 이름, 전화번호, timestamp 추가
             Attempt attempt = Attempt.builder()
                     .userName(winnerStr.split("\\|")[0])
@@ -79,8 +78,9 @@ public class NoSqlEventConsumerByRedis implements EventConsumer {
                     .timeStamp(Double.toString(score))
                     .eventName(eventName)
                     .build();
-            attemptRepository.save(attempt);
-        });
+            return attempt;
+        }).collect(Collectors.toList());
+        attemptRepository.saveAll(attempts);
         redisTemplate.delete(eventName);
         return true;
     }
