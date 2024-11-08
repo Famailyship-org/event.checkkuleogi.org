@@ -38,4 +38,8 @@ public class Winner {
 
     @Column(name = "uuid", nullable = false)
     private String uuid;
+
+    public void updateUuid(String uuid) {
+        this.uuid = uuid;
+    }
 }

@@ -11,13 +11,11 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface JpaEventRepository extends JpaRepository<Attempt, Long> {
+public interface AttemptRepository extends JpaRepository<Attempt, Long> {
 
     @Query("SELECT a FROM Attempt a ORDER BY a.timeStamp ASC")
-    Optional<List<Winner>> findTop100(Pageable pageable);
+    Optional<List<Attempt>> findTop100(Pageable pageable);
 
     @Query("SELECT CASE WHEN COUNT(a) > 0 THEN TRUE ELSE FALSE END FROM Attempt a WHERE a.userName = :userId")
     boolean existsByUserId(@Param("userId") String userId);
-
-    void save(Winner winner);
 }

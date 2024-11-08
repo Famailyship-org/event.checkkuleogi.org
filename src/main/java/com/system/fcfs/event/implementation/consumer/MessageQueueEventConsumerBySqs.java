@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.system.fcfs.event.domain.Attempt;
 import com.system.fcfs.event.domain.Winner;
 import com.system.fcfs.event.dto.request.GetWinnerRequestDTO;
-import com.system.fcfs.event.repository.JpaEventRepository;
+import com.system.fcfs.event.repository.AttemptRepository;
 import com.system.fcfs.event.repository.WinnerRepository;
 import com.system.fcfs.event.service.EventConsumer;
 import com.system.fcfs.global.domain.exception.NotFoundException;
@@ -29,7 +29,7 @@ public class MessageQueueEventConsumerBySqs implements EventConsumer {
     private final SqsClient sqsClient;
     private final ObjectMapper objectMapper;
     private final WinnerRepository winnerRepository;
-    private final JpaEventRepository jpaEventRepository;
+    private final AttemptRepository attemptRepository;
 
     @Value("${spring.cloud.aws.sqs.queue-url}")
     private String queueUrl;
@@ -98,7 +98,7 @@ public class MessageQueueEventConsumerBySqs implements EventConsumer {
             for (Message message : messages) {
                 Attempt attempt = parseAttemptMessageBody(message);
                 if (attempt != null) {
-                    jpaEventRepository.save(attempt);
+                    attemptRepository.save(attempt);
                     deleteMessageFromQueue(message);
                     attempts.add(attempt);
                 }

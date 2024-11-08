@@ -3,14 +3,13 @@ package com.system.fcfs.event.implementation.consumer;
 import com.system.fcfs.event.domain.Attempt;
 import com.system.fcfs.event.domain.Winner;
 import com.system.fcfs.event.dto.request.GetWinnerRequestDTO;
-import com.system.fcfs.event.repository.JpaEventRepository;
+import com.system.fcfs.event.repository.AttemptRepository;
 import com.system.fcfs.event.repository.WinnerRepository;
 import com.system.fcfs.event.service.EventConsumer;
 import com.system.fcfs.global.domain.exception.NotFoundException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Set;
@@ -22,12 +21,12 @@ import java.util.stream.Collectors;
 public class NoSqlEventConsumerByRedis implements EventConsumer {
 
     private final RedisTemplate<String, String> redisTemplate;
-    private final JpaEventRepository jpaEventRepository;
+    private final AttemptRepository attemptRepository;
     private final WinnerRepository winnerRepository;
 
-    public NoSqlEventConsumerByRedis(RedisTemplate<String, String> redisTemplate, JpaEventRepository jpaEventRepository, WinnerRepository winnerRepository) {
+    public NoSqlEventConsumerByRedis(RedisTemplate<String, String> redisTemplate, AttemptRepository attemptRepository, WinnerRepository winnerRepository) {
         this.redisTemplate = redisTemplate;
-        this.jpaEventRepository = jpaEventRepository;
+        this.attemptRepository = attemptRepository;
         this.winnerRepository = winnerRepository;
     }
 
@@ -80,7 +79,7 @@ public class NoSqlEventConsumerByRedis implements EventConsumer {
                     .timeStamp(Double.toString(score))
                     .eventName(eventName)
                     .build();
-            jpaEventRepository.save(attempt);
+            attemptRepository.save(attempt);
         });
         redisTemplate.delete(eventName);
         return true;
